@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Dependencies: tar, gzip, p7zip, bzip2
+# curl -sL https://git.io/_has | bash -s  tar gzip p7zip bzip2
 
 if [ $# -lt 1 ]; then
     echo "Usage: $(basename "$0") file"
