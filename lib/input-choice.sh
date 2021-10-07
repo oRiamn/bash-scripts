@@ -1,8 +1,9 @@
-# Usage: options=("one" "two" "three");
-# inputChoice "Choose:" 1 "${options[@]}";
+# Usage: 
+#
+# options=("one" "two" "three");
+# input-choice "Choose:" 1 "${options[@]}";
 # choice=$?; echo "${options[$choice]}"
-
-function inputChoice() {
+function input-choice() {
     echo "${1}"
     shift
     echo $(tput dim)-"Change option: [up/down], Select: [ENTER]" $(tput sgr0)
