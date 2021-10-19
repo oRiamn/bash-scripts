@@ -1,0 +1,207 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+}
+
+function array_size(a) {
+    count=0
+    for (k in a) ++count
+    return count
+}
+
+function array_push( arr, value ) {
+    arr[array_size(arr)+1] = value
+}
+
+function array_print( arr ) {
+    for (i = 0; i < array_size(arr); i++) {
+        if (! (arr[i] ~ /^[[:space:]]*$/  )) {
+            print arr[i]
+        }
+    }
+}
+
+function string_concat( x, text) {
+    if (x == "") {
+        x = text
+    } else {
+        x = x "\n" text
+    }
+    return x
+}
+
+function string_ltrim( s ) { 
+    sub(/^[[:space:]]+/, "", s) 
+    return s 
+}
+
+function string_rtrim( s ) { 
+    sub(/[[:space:]]+$/, "", s) 
+    return s 
+}
+
+function string_trim( s ) { 
+    return string_rtrim(string_ltrim(s))
+}
+
+
+function docblock_concat( docblock, key, value ) {
+    if (key in docblock) {
+        docblock[key] = string_concat(docblock[key], value)
+    } else {
+        docblock[key] = value
+    }
+}
+
+function docblock_print( docblock ){
+    if ( !("invalid" in docblock) && ("name" in docblock) ) {
+        print "# "  docblock["name"]
+        if ("brief" in docblock) {
+            print docblock["brief"]
+            print ""
+        }
+
+        if ("description" in docblock) {
+            print docblock["description"]
+        }
+
+        if ("stdout" in docblock) {
+            print "## Stdout"
+            printf("%c%c%cbash\n",96,96,96)
+            print docblock["stdout"]
+            printf("%c%c%c\n",96,96,96)
+        }
+
+        if ("exitcode" in docblock) {
+            print "## Exit code"
+            print "|code|reason|"
+            print "| -- | -- |"
+            print docblock["exitcode"]
+        }
+
+        if ("args" in docblock) {
+            print "## Arguments"
+            print "|name|value|"
+            print "| -- | -- |"
+            print docblock["args"]
+        } else if ("xargs" in docblock) {
+            print "## Arguments"
+            print "|name|value|"
+            print "| -- | -- |"
+            print docblock["xargs"]
+        }
+
+        if ("usage" in docblock) {
+            print "## Usage"
+            printf("%c%c%cbash\n",96,96,96)
+            print docblock["usage"]
+            printf("%c%c%c\n",96,96,96)
+        }
+
+        print ""
+    }
+}
+
+/^#!/ {
+    next
+}
+
+/^\#/,/^function/ {
+    if(currentblock==""){
+        currentblock="description"
+    }
+}
+
+
+/^[[:space:]]*# @brief/ {
+    sub(/^[[:space:]]*# @brief /, "")
+    docblock_concat(docblocks,"brief", string_trim($0))
+    sub(/^.*/, "#")
+}
+
+/^[[:space:]]*# @arg/ {
+    sub(/^[[:space:]]*# @arg /, "")
+    arg=$1
+    desc=substr($0,length(arg)+1)
+    docblock_concat(docblocks, "args", "|" string_trim(arg) "|" string_trim(desc) "|")
+    sub(/^.*/, "#")
+}
+
+/^[[:space:]]*# @see/ {
+    next
+}
+
+/^[[:space:]]*# @stdout/ {
+    sub(/^[[:space:]]*# @stdout /, "")
+    docblock_concat(docblocks,"stdout", string_trim($0))
+    sub(/^.*/, "#")
+}
+
+/^[[:space:]]*# @example:/ {
+    sub(/^[[:space:]]*# @example:/, "")
+    docblock_concat(docblocks,"usage", string_trim($0))    
+    sub(/^.*/, "#")
+}
+
+/^[[:space:]]*# @example/ {
+    currentblock="usage"
+    next
+}
+
+/^[[:space:]]*# Usage/ {
+    currentblock="usage"
+    next
+}
+
+/^[[:space:]]*# @exitcode/ {
+    sub(/^[[:space:]]*# @exitcode /, "")
+
+    line=string_trim($0)
+    code=$1
+    desc=string_trim(substr(line,length(code)+1))
+    docblock_concat(docblocks, "exitcode", "|" code "|" desc "|")
+    sub(/^.*/, "#")
+}
+
+/^\#/,/^function/ {
+    if($0 ~ /^[[:space:]]*$/) {
+        docblocks["invalid"]=true
+    }
+
+    line=string_trim($0)
+    if (line ~ /^\#/) {
+        sub(/\# ?/,"", line)    
+        if (line != "" ) {
+           docblock_concat(docblocks, currentblock, line)
+        }
+    } else if (line ~ /function/) {
+        sub(/\(/,"", $2)
+        sub(/\)/,"", $2)
+        docblock_concat(docblocks, "name", string_trim($2))  
+    }
+}
+
+
+/^function.*/,/^}/ {
+    line=string_trim($0)
+    if (line ~ /\=\$\{?([0-9]+)\}?/) {
+        sub(/local /,"")
+        sub(/=/, " ")
+        sub(/^[[:space:]]+/, "") 
+        sub(/[[:space:]]+$/, "") 
+
+        desc=$1
+        arg=substr($0,length($0)-1)
+
+        docblock_concat(docblocks, "xargs", "|" string_trim(arg) "|" string_trim(desc) "|")
+    }
+
+    if(line == "}"){
+        docblock_print(docblocks)
+        currentblock=""
+        delete docblocks
+    } 
+}
+
+END {
+}
