@@ -1,10 +1,12 @@
+# Provide input choice method
 # Usage: 
-#
 # options=("one" "two" "three");
 # input-choice "Choose:" 1 "${options[@]}";
 # choice=$?; echo "${options[$choice]}"
 function input-choice() {
-    echo "${1}"
+    local question=$1
+
+    echo "${quesiton}"
     shift
     echo $(tput dim)-"Change option: [up/down], Select: [ENTER]" $(tput sgr0)
     local selected="${1}"

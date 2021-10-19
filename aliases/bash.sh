@@ -10,5 +10,8 @@ do
     source $file
 done
 
-BINDIR="$(dirname $SCRIPT_DIR)/bin"
-export PATH="$BINDIR:$PATH"
+export BASHSCRIPTDIR="$(dirname $SCRIPT_DIR)"
+export BASHSCRIPTLIBDIR="$BASHSCRIPTDIR/lib"
+export BASHSCRIPTBINDIR="$BASHSCRIPTDIR/bin"
+
+export PATH="$BASHSCRIPTBINDIR:$PATH"

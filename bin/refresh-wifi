@@ -1,7 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR="$( cd -- "$(dirname $(dirname -- "${BASH_SOURCE[0]}" ))" &> /dev/null && pwd )"; source $SCRIPT_DIR/lib/import.sh
-
+source $BASHSCRIPTLIBDIR/import.sh
 import messages
 
 nmcli radio wifi off

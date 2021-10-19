@@ -1,5 +1,5 @@
+# executes a list of commands and displays the status of each of them 
 # Usage: 
-#
 # listOfTests=(
 #     'list files' 'ls -a'
 #     'exit with error' '$(exit 1)'
