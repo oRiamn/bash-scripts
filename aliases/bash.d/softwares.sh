@@ -8,6 +8,8 @@ if hash podman 2>/dev/null; then
   alias docker=podman
   if hash docker-compose 2>/dev/null; then
     export DOCKER_HOST=unix:///run/user/$UID/podman/podman.sock
+  elif hash podman-compose 2>/dev/null; then
+    alias docker-compose=podman-compose
   fi
 fi
 
