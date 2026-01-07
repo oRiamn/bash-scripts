@@ -19,3 +19,5 @@ JQC_objects="97"
 JQC_object_keys="31"
 
 export JQ_COLORS="$JQC_null:$JQC_false:$JQC_true:$JQC_numbers:$JQC_strings:$JQC_arrays:$JQC_objects:$JQC_object_keys"
+
+alias gitnevermind = git fetch -p && git reset --hard origin/$(current_branch)
