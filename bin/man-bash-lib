@@ -106,7 +106,7 @@ function docblock_print( docblock ){
     next
 }
 
-/^\#/,/^function/ {
+/^#/,/^function/ {
     if(currentblock==""){
         currentblock="description"
     }
@@ -163,14 +163,14 @@ function docblock_print( docblock ){
     sub(/^.*/, "#")
 }
 
-/^\#/,/^function/ {
+/^#/,/^function/ {
     if($0 ~ /^[[:space:]]*$/) {
         docblocks["invalid"]=true
     }
 
     line=string_trim($0)
-    if (line ~ /^\#/) {
-        sub(/\# ?/,"", line)    
+    if (line ~ /^#/) {
+        sub(/# ?/,"", line)    
         if (line != "" ) {
            docblock_concat(docblocks, currentblock, line)
         }
@@ -184,7 +184,7 @@ function docblock_print( docblock ){
 
 /^function.*/,/^}/ {
     line=string_trim($0)
-    if (line ~ /\=\$\{?([0-9]+)\}?/) {
+    if (line ~ /=\$\{?([0-9]+)\}?/) {
         sub(/local /,"")
         sub(/=/, " ")
         sub(/^[[:space:]]+/, "") 
